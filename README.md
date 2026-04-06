@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Campus Drive Portal</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        /* Input section styling */
+        .input-group { margin-bottom: 20px; display: flex; gap: 10px; }
+        input { padding: 8px; flex: 1; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; color: white; }
+        .btn-add { background: #28a745; }
+        .btn-ajax { background: #007bff; width: 100%; margin-top: 10px; }
+
+        /* Table styling with CSS Selectors */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #343a40; color: white; }
+
+        /* Style odd/even rows differently */
+        tbody tr:nth-child(odd) { background-color: #ffffff; }
+        tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        /* Hover effect */
+        tbody tr:hover { background-color: #e9ecef; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Placement List</h2>
+    
+    <div class="input-group">
+        <input type="text" id="studentName" placeholder="Student Name">
+        <input type="text" id="companyName" placeholder="Company Name">
+        <button class="btn-add" onclick="addStudent()">Add Student</button>
+    </div>
+
+    <table id="studentTable">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Company</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td>John Doe</td><td>Google</td></tr>
+            <tr><td>Jane Smith</td><td>Microsoft</td></tr>
+        </tbody>
+    </table>
+
+    <button class="btn-ajax" onclick="loadMoreStudents()">Load More from JSON (AJAX)</button>
+</div>
+
+<script>
+    // Part 1: Adding a name dynamically
+    function addStudent() {
+        const nameInput = document.getElementById('studentName');
+        const companyInput = document.getElementById('companyName');
+        const tbody = document.getElementById('tableBody');
+
+        if(nameInput.value && companyInput.value) {
+            const row = `<tr><td>${nameInput.value}</td><td>${companyInput.value}</td></tr>`;
+            tbody.innerHTML += row;
+            
+            // Clear inputs
+            nameInput.value = '';
+            companyInput.value = '';
+        } else {
+            alert("Please fill in both fields!");
+        }
+    }
+
+    // Part 2: AJAX implementation (Fetch API)
+    function loadMoreStudents() {
+        /* Note: To run this locally, 'data.json' must exist in the same folder.
+           Browser security (CORS) might block this if you open the HTML file 
+           directly; use a local server (like Live Server) for best results.
+        */
+        fetch('students.json')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('tableBody');
+                data.forEach(student => {
+                    const row = `<tr><td>${student.name}</td><td>${student.company}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert("Could not load data. Ensure students.json exists.");
+            });
+    }
+</script>
+
+</body>
+</html>
