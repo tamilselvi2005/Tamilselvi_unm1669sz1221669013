@@ -1,0 +1,63 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(bodyParser.json());
+
+// In-memory "Database"
+let students = [
+    { id: 1, name: "Alice Smith", grade: "A" },
+    { id: 2, name: "Bob Jones", grade: "B" }
+];
+
+// Helper function to simulate DB delay
+const simulateDbOp = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * ROUTE: Get all students
+ * Method: GET
+ */
+app.get('/students', async (req, res) => {
+    try {
+        console.log("Fetching students...");
+        await simulateDbOp(500); // Simulate network latency
+        res.status(200).json(students);
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving data" });
+    }
+});
+
+/**
+ * ROUTE: Add a new student
+ * Method: POST
+ */
+app.post('/students', async (req, res) => {
+    try {
+        const { name, grade } = req.body;
+
+        if (!name || !grade) {
+            return res.status(400).json({ message: "Name and Grade are required" });
+        }
+
+        console.log("Saving student to 'database'...");
+        await simulateDbOp(800); // Simulate write time
+
+        const newStudent = {
+            id: students.length + 1,
+            name,
+            grade
+        };
+
+        students.push(newStudent);
+        res.status(201).json(newStudent);
+    } catch (error) {
+        res.status(500).json({ message: "Error saving student" });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
