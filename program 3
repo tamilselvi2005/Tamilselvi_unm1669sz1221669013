@@ -1,0 +1,53 @@
+const mongoose = require('mongoose');
+
+// 1. Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/placementDB')
+    .then(() => console.log("Connected to MongoDB..."))
+    .catch(err => console.error("Could not connect...", err));
+
+// 2. Define Student Schema
+const studentSchema = new mongoose.Schema({
+    name: String,
+    gpa: Number,
+    skills: [String],
+    isPlaced: { type: Boolean, default: false },
+    company: String
+});
+
+const Student = mongoose.model('Student', studentSchema);
+
+// 3. Main Function to Run Operations
+async function managePlacement() {
+    // Clear existing data for a fresh demo
+    await Student.deleteMany({});
+
+    // INSERT: Adding new students
+    const students = await Student.insertMany([
+        { name: "Alice Johnson", gpa: 3.8, skills: ["Node.js", "MongoDB"], isPlaced: false },
+        { name: "Bob Smith", gpa: 3.4, skills: ["Java", "SQL"], isPlaced: false },
+        { name: "Charlie Davis", gpa: 3.9, skills: ["Python", "AWS"], isPlaced: false }
+    ]);
+    console.log("Inserted Students:", students.length);
+
+    // UPDATE: Simulating a student getting placed
+    const updatedStudent = await Student.findOneAndUpdate(
+        { name: "Alice Johnson" },
+        { isPlaced: true, company: "TechNova" },
+        { new: true }
+    );
+    console.log("\n--- Student Placed ---");
+    console.log(updatedStudent);
+
+    // QUERY: Find all students with GPA > 3.5 who are NOT placed
+    const candidates = await Student.find({
+        gpa: { $gt: 3.5 },
+        isPlaced: false
+    });
+
+    console.log("\n--- Eligible Candidates for Next Drive ---");
+    console.log(candidates);
+
+    mongoose.disconnect();
+}
+
+managePlacement();
