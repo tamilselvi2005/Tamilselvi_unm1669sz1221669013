@@ -93,6 +93,7 @@
                 alert("Could not load data. Ensure students.json exists.");
             });
     }
+
 </script>
 
 </body>
